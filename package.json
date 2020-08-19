@@ -1,0 +1,41 @@
+{
+  "name": "drive_passman",
+  "version": "0.0.1",
+  "description": "trying to do something with those old usb drives",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Password Manager\"",
+    "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/icon.png --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Password Manager\"",
+    "dist": "electron-builder -w",
+    "pack": "electron-builder --dir"
+  },
+  "author": "Sr.Leon",
+  "license": "",
+  "homepage": "http://nope.es",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^6.0.3",
+    "electron-builder": "^22.8.1"
+  },
+  "build": {
+    "appId": "com.srleon.drivepassman",
+    "productName": "Password Manager",
+    "nodeGypRebuild": false,
+    "win": {
+      "target": "portable",
+      "icon": "assets/icons/win/icon.ico"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icons/png/icon.png",
+      "maintainer": "Sr.Leon"
+    }
+  }
+}

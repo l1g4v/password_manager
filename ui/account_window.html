@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!--I am to lazy to properly document this-->
+<html>
+  <head>
+    <link href="css/material_icons.css" rel="stylesheet" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="css/materialize.min.css"
+      media="screen,projection"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .dragre {
+        -ms-overflow-style: scrollbar;
+        -webkit-app-region: drag;
+      }
+      body {
+        overflow-x: hidden;
+      }
+    </style>
+  </head>
+
+  <body class="#212121 grey darken-4">
+    <div class="dragre">
+      <i class="material-icons grey-text">account_box</i>
+    </div>
+    <div class="container">
+      <div class="row">
+        <!-- <div class="col s3 push-s9" style="padding-right: 1em;"> WIP
+         <img
+            id="preview"
+            src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage3.mouthshut.com%2Fimages%2Fimagesp%2F925043647s.jpg&f=1&nofb=1"
+            width="180"
+            height="180"
+            onclick="input.click()"
+          />
+          <input style="opacity: 0;" type="file" id="icon" accept="image/*" />
+        </div>-->
+        <div class="" id="form">
+          <div>
+            <label class="grey-text">Name</label>
+            <input type="text" id="name" class="validate grey-text" autofocus />
+            <label class="grey-text">Username</label>
+            <input type="text" id="user" class="validate grey-text" />
+            <label class="grey-text">Email</label>
+            <input type="email" id="email" class="validate grey-text" />
+            <label class="grey-text">Password</label>
+            <input type="password" id="password" class="validate grey-text" />
+          </div>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="saveData()">Save</button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="closeWin()">
+            Close
+          </button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="togglePassword()">
+            Show password
+          </button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="genPass()">
+            Generate
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const crypto = require("crypto");
+      const electron = require("electron");
+      const { ipcRenderer } = electron;
+      
+      /* Utils */
+      const fileTypes = [
+        "image/apng",
+        "image/bmp",
+        "image/gif",
+        "image/jpeg",
+        "image/pjpeg",
+        "image/png",
+        "image/svg+xml",
+        "image/tiff",
+        "image/webp",
+        "image/x-icon",
+      ];
+
+      /* WIP
+      function validFileType(file) {
+        return fileTypes.includes(file.type);
+      }
+      function arrayBufferToBase64(buffer) {
+        var binary = "";
+        var bytes = new Uint8Array(buffer);
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      }
+
+      function updateIconUpload() {
+        const file = input.files[0];
+        if (validFileType(file)) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var arrayBuffer = this.result,
+              array = new Uint8Array(arrayBuffer);
+            iconB64 = arrayBufferToBase64(array);
+            document.getElementById(
+              "preview"
+            ).src = `data:${file.type};base64,${iconB64}`;
+          };
+          reader.readAsArrayBuffer(this.files[0]);
+        }
+      }*/
+
+      function saveData(){
+        var name = document.getElementById('name').value;
+        var user = document.getElementById('user').value;
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        ipcRenderer.send("account:save", {
+            name:name,
+            user:user,
+            email:email,
+            password:password
+        });
+        const remote = electron.remote;
+        let w = remote.getCurrentWindow();
+        w.close();
+      }
+
+      function closeWin() {
+        const remote = electron.remote;
+        let w = remote.getCurrentWindow();
+        w.close();
+      }
+
+      function genPass() {
+        document.querySelector("#password").value = randPassword();
+      }
+
+      function randPassword(size = 0) {
+        var length = size || Math.floor(Math.random() * (15 - 8 + 1)) + 8,
+          charset =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]{}();:!'*´¿?@$%&/¨¨^~",
+          retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+          var char = charset.charAt(Math.floor(Math.random() * n));
+          if (i != 0) {
+            while (
+              char == retVal[i - 1].toLowerCase() ||
+              char == retVal[i - 1].toUpperCase()
+            )
+              char = charset.charAt(Math.floor(Math.random() * n));
+          }
+          retVal += char;
+        }
+        return retVal;
+      }
+
+      /**
+      Adds a delete button when you load the account data
+      */
+      ipcRenderer.on('account:load', (e, data, filename) => {
+        document.getElementById('name').value = data.name;
+        document.getElementById('name').disabled = true;
+        document.getElementById('user').value = data.user;
+        document.getElementById('email').value = data.email;
+        document.getElementById('password').value = data.password;
+        //document.getElementById("preview").src = b64; WIP
+        M.updateTextFields();
+        const formContainer = document.getElementById('form');
+        const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount('${filename}')">Delete</button>`;
+        formContainer.insertAdjacentHTML("beforeend", delBnt);
+      });
+
+      function togglePassword(){
+        var x = document.getElementById("password");
+        if (x.type === "password") {
+          x.type = "text";
+        } else {
+          x.type = "password";
+        }
+      }
+
+      function deleteAccount(filename){
+        ipcRenderer.send('account:delete',filename);
+        closeWin();
+      }
+      
+    </script>
+
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+  </body>
+</html>

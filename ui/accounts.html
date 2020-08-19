@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--I am to lazy to properly document this-->
+<html>
+  <head>
+    <link href="css/material_icons.css" rel="stylesheet" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="css/materialize.min.css"
+      media="screen,projection"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .dragre {
+        -ms-overflow-style: scrollbar;
+        -webkit-app-region: drag;
+      }
+    </style>
+  </head>
+  <body class="#212121 grey darken-4">
+    <nav class="">
+      <div class="nav-wrapper #6d4c41 brown darken-1">
+        <a class="brand-logo center dragre" style="user-select: none;"
+          >Accounts</a
+        >
+        <a href="#" data-target="sidebar" class="sidenav-trigger"
+          ><i class="material-icons">menu</i></a
+        >
+      </div>
+    </nav>
+
+    <ul class="sidenav #212121 grey darken-4" id="sidebar">
+      <li onclick="ipcRenderer.send('account:new')">
+        <a style="user-select: none;" class="grey-text">Add Account</a>
+      </li>
+      <li onclick="quit()"><a style="user-select: none;" class="grey-text">Quit</a></li>
+    </ul>
+
+    <ul id="list" class="collapsible expandable"></ul>
+
+    <script>
+      var el = 0;
+      const electron = require("electron");
+      const { ipcRenderer } = electron;
+      const accountList = document.getElementById('list');
+
+      ipcRenderer.on("accounts:load", (e, data) => {
+        accountList.innerHTML = '';
+        for (var i = 0; i < data.length; i++) {
+          var card = `<li >
+                    <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('account:load','${data[i].filename}')">
+                        <i class="material-icons">account_box</i>
+                        ${data[i].decrypted}
+                    </div>
+                    
+                </li>`;
+                accountList.insertAdjacentHTML("beforeend", card);
+          el++;
+          var instance = M.Collapsible.init(accountList, {
+            accordion: false,
+          });
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var elems = document.querySelectorAll(".sidenav");
+        var instances = M.Sidenav.init(elems);
+      });
+
+      function quit() {
+        ipcRenderer.send("app:quit");
+      }
+
+    </script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+  </body>
+</html>
