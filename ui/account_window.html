@@ -48,7 +48,7 @@
             <label class="grey-text">Password</label>
             <input type="password" id="password" class="validate grey-text" />
           </div>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="saveData()">Save</button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" id="save" onclick="saveData()">Save</button>
           <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="closeWin()">
             Close
           </button>
@@ -111,7 +111,10 @@
         }
       }*/
 
+      let file = '';
+      
       function saveData(){
+        if(file !== '') ipcRenderer.send('account:delete',file);
         var name = document.getElementById('name').value;
         var user = document.getElementById('user').value;
         var email = document.getElementById('email').value;
@@ -168,8 +171,9 @@
         //document.getElementById("preview").src = b64; WIP
         M.updateTextFields();
         const formContainer = document.getElementById('form');
-        const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount('${filename}')">Delete</button>`;
+        const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
         formContainer.insertAdjacentHTML("beforeend", delBnt);
+        file = filename;
       });
 
       function togglePassword(){
@@ -181,8 +185,8 @@
         }
       }
 
-      function deleteAccount(filename){
-        ipcRenderer.send('account:delete',filename);
+      function deleteAccount(){
+        ipcRenderer.send('account:delete',file);
         closeWin();
       }
       
