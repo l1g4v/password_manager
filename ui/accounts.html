@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<meta http-equiv="Content-Security-Policy" content="script-src 'self';" />
 <!--I am to lazy to properly document this-->
 <html>
   <head>
@@ -31,10 +30,10 @@
     </nav>
 
     <ul class="sidenav #212121 grey darken-4" id="sidebar">
-      <li onclick="ipcRenderer.send('account:new')">
+      <li onclick="window.bridge.send('account:new')">
         <a style="user-select: none;" class="grey-text">New entry</a>
       </li>
-      <li onclick="ipcRenderer.send('otp:new')">
+      <li onclick="window.bridge.send('otp:new')">
         <a style="user-select: none;" class="grey-text">New totp entry</a>
       </li>
       <li onclick="quit()">
@@ -46,18 +45,18 @@
 
     <script>
       var el = 0;
-      const electron = require("electron");
-      const { ipcRenderer } = electron;
+      //const electron = require("electron");
+      //const { ipcRenderer } = electron;
       const accountList = document.getElementById("list");
 
-      ipcRenderer.on("accounts:load", (e, data) => {
+      window.bridge.receive("accounts:load", (data) => {
 
         accountList.innerHTML = "";
         
         for (var i = 0; i < data.length; i++) {
           if (data[i].decrypted.indexOf("(tOTP)") !== -1) {
             var card = `<li >
-                  <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('otp:load','${data[i].filename}')">
+                  <div class="collapsible-header grey-text grey darken-4" ondblclick="window.bridge.send('otp:load','${data[i].filename}')">
                       <i class="material-icons">lock</i>
                       ${data[i].decrypted}
                   </div>
@@ -71,7 +70,7 @@
           } 
           else {
             var card = `<li >
-                  <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('account:load','${data[i].filename}')">
+                  <div class="collapsible-header grey-text grey darken-4" ondblclick="window.bridge.send('account:load','${data[i].filename}')">
                       <i class="material-icons">account_box</i>
                       ${data[i].decrypted}
                   </div>
@@ -93,7 +92,7 @@
       });
 
       function quit() {
-        ipcRenderer.send("app:quit");
+        window.bridge.send("app:quit");
       }
     </script>
     <script type="text/javascript" src="js/materialize.min.js"></script>

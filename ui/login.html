@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<meta http-equiv="Content-Security-Policy" content="script-src 'self';" />
 <!--I am to lazy to properly document this-->
 <html>
   <head>
@@ -27,25 +26,17 @@
         <!--<label><input type="checkbox" id='save_mem'><span>Save password in memory</span> </label>-->
     </form>
     <script type="text/javascript">
-        const electron = require('electron');
-        const { ipcRenderer } = electron;
-        const crypto = require('crypto');
-        
         function logIn(){
             var password = document.getElementById("password").value;
-            var passwordHash = crypto.createHash('sha512','salty')
-            .update(password) 
-            .digest('base64'); 
+            var passwordHash = window.bridge.sha512hash(password); 
 
             delete password;
-            ipcRenderer.send('login:init',passwordHash,true);
-            const remote = electron.remote;
-            let w = remote.getCurrentWindow();
-            w.close();
+            window.bridge.send('login:init',passwordHash,true);
+            window.close();
         }
         
         function closeApp(){
-            ipcRenderer.send('app:quit');
+            window.bridge.send('app:quit');
         }
     </script>
     <script type="text/javascript" src="js/materialize.min.js"></script>

@@ -10,8 +10,11 @@ app.on("ready", () => {
     width: 500,
     height: 150,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       devTools: false,
+      preload: app.getAppPath() + '/preloader/login.preloader.js',
+      contextIsolation: true,
+      enableRemoteModule: false,
     },
     frame: false,
     alwaysOnTop: false,
@@ -29,14 +32,21 @@ app.on("ready", () => {
   loginWindow.once("ready-to-show", () => {
     loginWindow.show();
   });
+
+  loginWindow.on("closed", () => {
+    loginWindow = null;
+  });
 });
 
 let loadAccountMenu = () => {
   mainWindow = new BrowserWindow({
     width: 450,
     webPreferences: {
-      nodeIntegration: true,
-      devTools: false,
+      nodeIntegration: false,
+      devTools: true,
+      preload: app.getAppPath() + '/preloader/accounts.preloader.js',
+      contextIsolation: true,
+      enableRemoteModule: false,
     },
     frame: false,
     alwaysOnTop: false,
@@ -72,8 +82,11 @@ let createAccountWindow = (load = "") => {
     width: 600,
     height: 380,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       devTools: false,
+      preload: app.getAppPath() + '/preloader/account_window.preloader.js',
+      contextIsolation: true,
+      enableRemoteModule: false,
     },
     resizable: false,
     frame: false,
@@ -99,6 +112,10 @@ let createAccountWindow = (load = "") => {
   accountWindow.once("ready-to-show", () => {
     accountWindow.show();
   });
+
+  accountWindow.on("closed", () => {
+    accountWindow = null;
+  });
 };
 
 let createOTPWindow = (load = "") => {
@@ -106,8 +123,11 @@ let createOTPWindow = (load = "") => {
     width: 600,
     height: 335,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       devTools: false,
+      preload: app.getAppPath() + '/preloader/otp_window.preloader.js',
+      contextIsolation: true,
+      enableRemoteModule: false,
     },
     resizable: false,
     frame: false,
@@ -133,6 +153,11 @@ let createOTPWindow = (load = "") => {
   otpWindow.once("ready-to-show", () => {
     otpWindow.show();
   });
+
+  otpWindow.on("closed", () => {
+    otpWindow = null;
+  });
+
 };
 
 ipcMain.on("login:init", (event, password, save) => {

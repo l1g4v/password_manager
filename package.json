@@ -1,6 +1,6 @@
 {
   "name": "drive_passman",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "trying to do something with those old usb drives",
   "main": "index.js",
   "private": true,

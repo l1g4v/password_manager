@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <!--I am to lazy to properly document this-->
-<meta http-equiv="Content-Security-Policy" content="script-src 'self';" />
 <html>
   <head>
     <link href="css/material_icons.css" rel="stylesheet" />
@@ -41,7 +40,7 @@
             <div class="determinate" id="otp_load" style="width: 0%"></div>
         </div>
           <button class="btn waves-effect waves-light #6d4c41 brown darken-1" id="save" onclick="saveData()">Save</button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="closeWin()">
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="window.close()">
             Close
           </button>
           <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="togglePassword()">
@@ -52,67 +51,46 @@
     </div>
 
     <script>
-      const crypto = require("crypto");
-      const electron = require("electron");
-      const otp = require('otpauth');
-      const { ipcRenderer } = electron;
+      //const electron = require("electron");
+      //const otp = window.bridge.otp;
+      //const { ipcRenderer } = electron;
       
       /* Utils */
 
       let file = '';
-      let secret = '';
       
       function saveData(){
-        if(file !== '') ipcRenderer.send('otp:delete',file);
+        if(file !== '') window.bridge.send('otp:delete',file);
         var name = document.getElementById('name').value + ' (tOTP)';
         var secret = document.getElementById('secret').value;
-        ipcRenderer.send("otp:save", {
+        window.bridge.send("otp:save", {
             name:name,
             secret:secret,
         });
-        const remote = electron.remote;
-        let w = remote.getCurrentWindow();
-        w.close();
+        window.close();
       }
-
-      function closeWin() {
-        const remote = electron.remote;
-        let w = remote.getCurrentWindow();
-        w.close();
-      }
-
 
       /**
       Adds a delete button when you load the otp data
       */
-      ipcRenderer.on('otp:load', (e, data, filename) => {
+      window.bridge.receive('otp:load', (data, filename) => {
         document.getElementById('name').value = data.name;
         document.getElementById('name').disabled = true;
         document.getElementById('secret').value = 'this is a secret right?';
         document.getElementById('secret').disabled = true;
-
         M.updateTextFields();
 
         const formContainer = document.getElementById('form');
         const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
         formContainer.insertAdjacentHTML("beforeend", delBnt);
         file = filename;
-
-        let totp = new otp.TOTP({
-          issuer: '',
-          label: '',
-          algorithm: 'SHA1',
-          digits: 6,
-          period: 30,
-          secret: data.secret
-      });
-
+        
         document.getElementById("otp_load").style.width = "0%";
-        document.getElementById('otp').value = totp.generate();
+        document.getElementById('otp').value = window.bridge.otpGen(data.secret);
 
         setInterval(()=>{
           document.getElementById("otp_load").style.width = "0%";
-          document.getElementById('otp').value = totp.generate();
+          document.getElementById('otp').value = window.bridge.otpGen(data.secret);
         },30000);
 
         setInterval(()=>{
@@ -131,8 +109,8 @@
       }
 
       function deleteAccount(){
-        ipcRenderer.send('otp:delete',file);
-        closeWin();
+        window.bridge.send('otp:delete',file);
+        window.close();
       }
       
     </script>

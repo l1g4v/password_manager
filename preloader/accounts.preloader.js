@@ -1,29 +1,22 @@
 const {
     contextBridge,
-    ipcRenderer,
-    remote
+    ipcRenderer
 } = require("electron");
-const crypto = require('crypto');
 
 
 contextBridge.exposeInMainWorld(
     "bridge", {
         send: (channel, ...args) => {
-            let validChannels = ['login:init','app:quit'];
+            let validChannels = ['account:new','otp:new','account:load','otp:load','app:quit'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, ...args);
             }
         },
         receive: (channel, func) => {
-            let validChannels = [];
+            let validChannels = ['accounts:load'];
             if (validChannels.includes(channel)) {
                 ipcRenderer.on(channel, (event, ...args) => func(...args));
             }
-        },
-        sha512hash: (value) => {
-            return crypto.createHash('sha512','salty')
-            .update(value) 
-            .digest('base64');
         }
     }
 );
