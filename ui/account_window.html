@@ -39,14 +39,29 @@
             <label class="grey-text">Password</label>
             <input type="password" id="password" class="validate grey-text" />
           </div>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" id="save" onclick="saveData()">Save</button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="window.close()">
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            id="save"
+            onclick="saveData()"
+          >
+            Save
+          </button>
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            onclick="window.close()"
+          >
             Close
           </button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="togglePassword()">
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            onclick="togglePassword()"
+          >
             Show password
           </button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="genPass()">
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            onclick="genPass()"
+          >
             Generate
           </button>
         </div>
@@ -54,9 +69,6 @@
     </div>
 
     <script>
-      //const electron = require("electron");
-      //const { ipcRenderer } = electron;
-      
       /* Utils */
       const fileTypes = [
         "image/apng",
@@ -71,20 +83,19 @@
         "image/x-icon",
       ];
 
+      let file = "";
 
-      let file = '';
-      
-      function saveData(){
-        if(file !== '') window.bridge.send('account:delete',file);
-        var name = document.getElementById('name').value;
-        var user = document.getElementById('user').value;
-        var email = document.getElementById('email').value;
-        var password = document.getElementById('password').value;
+      function saveData() {
+        if (file !== "") window.bridge.send("account:delete", file);
+        var name = document.getElementById("name").value;
+        var user = document.getElementById("user").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
         window.bridge.send("account:save", {
-            name:name,
-            user:user,
-            email:email,
-            password:password
+          name: name,
+          user: user,
+          email: email,
+          password: password,
         });
         window.close();
       }
@@ -115,21 +126,21 @@
       /**
       Adds a delete button when you load the account data
       */
-      window.bridge.receive('account:load', (data, filename) => {
-        document.getElementById('name').value = data.name;
-        document.getElementById('name').disabled = true;
-        document.getElementById('user').value = data.user;
-        document.getElementById('email').value = data.email;
-        document.getElementById('password').value = data.password;
+      window.bridge.receive("account:load", (data, filename) => {
+        document.getElementById("name").value = data.name;
+        document.getElementById("name").disabled = true;
+        document.getElementById("user").value = data.user;
+        document.getElementById("email").value = data.email;
+        document.getElementById("password").value = data.password;
         //document.getElementById("preview").src = b64; WIP
         M.updateTextFields();
-        const formContainer = document.getElementById('form');
+        const formContainer = document.getElementById("form");
         const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
         formContainer.insertAdjacentHTML("beforeend", delBnt);
         file = filename;
       });
 
-      function togglePassword(){
+      function togglePassword() {
         var x = document.getElementById("password");
         if (x.type === "password") {
           x.type = "text";
@@ -138,11 +149,10 @@
         }
       }
 
-      function deleteAccount(){
-        window.bridge.send('account:delete',file);
+      function deleteAccount() {
+        window.bridge.send("account:delete", file);
         window.close();
       }
-      
     </script>
 
     <script type="text/javascript" src="js/materialize.min.js"></script>

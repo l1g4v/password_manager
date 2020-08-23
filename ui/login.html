@@ -2,42 +2,62 @@
 <!--I am to lazy to properly document this-->
 <html>
   <head>
-    <link href="css/material_icons.css" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link href="css/material_icons.css" rel="stylesheet" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="css/materialize.min.css"
+      media="screen,projection"
+    />
     <style>
-        .dragre {
-            -ms-overflow-style: scrollbar;
-            -webkit-app-region: drag;
-        }
+      .dragre {
+        -ms-overflow-style: scrollbar;
+        -webkit-app-region: drag;
+      }
     </style>
   </head>
 
   <body class="#212121 grey darken-4">
     <div class="dragre">
-        <i class="material-icons grey-text">lock</i>
+      <i class="material-icons grey-text">lock</i>
     </div>
     <form style="padding: 0em;" class="container">
-        <div class="">
-            <label class="grey-text">Password</label>
-            <input type="password" id="password" class="validate grey-text" autofocus>
-        </div>
-        <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="logIn()">Decrypt</button>
-        <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="closeApp()">Close</button>
-        <!--<label><input type="checkbox" id='save_mem'><span>Save password in memory</span> </label>-->
+      <div class="">
+        <label class="grey-text">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="validate grey-text"
+          autofocus
+        />
+      </div>
+      <button
+        class="btn waves-effect waves-light #6d4c41 brown darken-1"
+        onclick="logIn()"
+      >
+        Decrypt
+      </button>
+      <button
+        class="btn waves-effect waves-light #6d4c41 brown darken-1"
+        onclick="closeApp()"
+      >
+        Close
+      </button>
+      <!--<label><input type="checkbox" id='save_mem'><span>Save password in memory</span> </label>-->
     </form>
     <script type="text/javascript">
-        function logIn(){
-            var password = document.getElementById("password").value;
-            var passwordHash = window.bridge.sha512hash(password); 
+      function logIn() {
+        var password = document.getElementById("password").value;
+        var passwordHash = window.bridge.sha512hash(password);
 
-            delete password;
-            window.bridge.send('login:init',passwordHash,true);
-            window.close();
-        }
-        
-        function closeApp(){
-            window.bridge.send('app:quit');
-        }
+        delete password;
+        window.bridge.send("login:init", passwordHash, true);
+        window.close();
+      }
+
+      function closeApp() {
+        window.bridge.send("app:quit");
+      }
     </script>
     <script type="text/javascript" src="js/materialize.min.js"></script>
   </body>

@@ -45,14 +45,11 @@
 
     <script>
       var el = 0;
-      //const electron = require("electron");
-      //const { ipcRenderer } = electron;
       const accountList = document.getElementById("list");
 
       window.bridge.receive("accounts:load", (data) => {
-
         accountList.innerHTML = "";
-        
+
         for (var i = 0; i < data.length; i++) {
           if (data[i].decrypted.indexOf("(tOTP)") !== -1) {
             var card = `<li >
@@ -67,8 +64,7 @@
             var instance = M.Collapsible.init(accountList, {
               accordion: false,
             });
-          } 
-          else {
+          } else {
             var card = `<li >
                   <div class="collapsible-header grey-text grey darken-4" ondblclick="window.bridge.send('account:load','${data[i].filename}')">
                       <i class="material-icons">account_box</i>
@@ -82,7 +78,6 @@
               accordion: false,
             });
           }
-
         }
       });
 

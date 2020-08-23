@@ -37,13 +37,25 @@
             <input type="text" disabled id="otp" class="validate grey-text" />
           </div>
           <div class="progress">
-            <div class="determinate" id="otp_load" style="width: 0%"></div>
-        </div>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" id="save" onclick="saveData()">Save</button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="window.close()">
+            <div class="determinate" id="otp_load" style="width: 0%;"></div>
+          </div>
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            id="save"
+            onclick="saveData()"
+          >
+            Save
+          </button>
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            onclick="window.close()"
+          >
             Close
           </button>
-          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="togglePassword()">
+          <button
+            class="btn waves-effect waves-light #6d4c41 brown darken-1"
+            onclick="togglePassword()"
+          >
             Show secret
           </button>
         </div>
@@ -51,21 +63,17 @@
     </div>
 
     <script>
-      //const electron = require("electron");
-      //const otp = window.bridge.otp;
-      //const { ipcRenderer } = electron;
-      
       /* Utils */
 
-      let file = '';
-      
-      function saveData(){
-        if(file !== '') window.bridge.send('otp:delete',file);
-        var name = document.getElementById('name').value + ' (tOTP)';
-        var secret = document.getElementById('secret').value;
+      let file = "";
+
+      function saveData() {
+        if (file !== "") window.bridge.send("otp:delete", file);
+        var name = document.getElementById("name").value + " (tOTP)";
+        var secret = document.getElementById("secret").value;
         window.bridge.send("otp:save", {
-            name:name,
-            secret:secret,
+          name: name,
+          secret: secret,
         });
         window.close();
       }
@@ -73,33 +81,40 @@
       /**
       Adds a delete button when you load the otp data
       */
-      window.bridge.receive('otp:load', (data, filename) => {
-        document.getElementById('name').value = data.name;
-        document.getElementById('name').disabled = true;
-        document.getElementById('secret').value = 'this is a secret right?';
-        document.getElementById('secret').disabled = true;
+      window.bridge.receive("otp:load", (data, filename) => {
+        document.getElementById("name").value = data.name;
+        document.getElementById("name").disabled = true;
+        document.getElementById("secret").value = "this is a secret right?";
+        document.getElementById("secret").disabled = true;
         M.updateTextFields();
 
-        const formContainer = document.getElementById('form');
+        const formContainer = document.getElementById("form");
         const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
         formContainer.insertAdjacentHTML("beforeend", delBnt);
         file = filename;
-        
+
         document.getElementById("otp_load").style.width = "0%";
-        document.getElementById('otp').value = window.bridge.otpGen(data.secret);
+        document.getElementById("otp").value = window.bridge.otpGen(
+          data.secret
+        );
 
-        setInterval(()=>{
+        setInterval(() => {
           document.getElementById("otp_load").style.width = "0%";
-          document.getElementById('otp').value = window.bridge.otpGen(data.secret);
-        },30000);
+          document.getElementById("otp").value = window.bridge.otpGen(
+            data.secret
+          );
+        }, 30000);
 
-        setInterval(()=>{
-          var progress = parseInt(document.getElementById("otp_load").style.width.replace("%","")) + 1;
+        setInterval(() => {
+          var progress =
+            parseInt(
+              document.getElementById("otp_load").style.width.replace("%", "")
+            ) + 1;
           document.getElementById("otp_load").style.width = `${progress}%`;
-        },300);
+        }, 300);
       });
 
-      function togglePassword(){
+      function togglePassword() {
         var x = document.getElementById("secret");
         if (x.type === "password") {
           x.type = "text";
@@ -108,11 +123,10 @@
         }
       }
 
-      function deleteAccount(){
-        window.bridge.send('otp:delete',file);
+      function deleteAccount() {
+        window.bridge.send("otp:delete", file);
         window.close();
       }
-      
     </script>
 
     <script type="text/javascript" src="js/materialize.min.js"></script>
