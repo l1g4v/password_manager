@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<!--I am to lazy to properly document this-->
+<meta http-equiv="Content-Security-Policy" content="script-src 'self';" />
+<html>
+  <head>
+    <link href="css/material_icons.css" rel="stylesheet" />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="css/materialize.min.css"
+      media="screen,projection"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .dragre {
+        -ms-overflow-style: scrollbar;
+        -webkit-app-region: drag;
+      }
+      body {
+        overflow-x: hidden;
+      }
+    </style>
+  </head>
+
+  <body class="#212121 grey darken-4">
+    <div class="dragre">
+      <i class="material-icons grey-text">account_box</i>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="" id="form">
+          <div>
+            <label class="grey-text">Title</label>
+            <input type="text" id="name" class="validate grey-text" autofocus />
+            <label class="grey-text">Secret</label>
+            <input type="password" id="secret" class="validate grey-text" />
+            <label class="grey-text">Code</label>
+            <input type="text" disabled id="otp" class="validate grey-text" />
+          </div>
+          <div class="progress">
+            <div class="determinate" id="otp_load" style="width: 0%"></div>
+        </div>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" id="save" onclick="saveData()">Save</button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="closeWin()">
+            Close
+          </button>
+          <button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="togglePassword()">
+            Show secret
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const crypto = require("crypto");
+      const electron = require("electron");
+      const otp = require('otpauth');
+      const { ipcRenderer } = electron;
+      
+      /* Utils */
+
+      let file = '';
+      let secret = '';
+      
+      function saveData(){
+        if(file !== '') ipcRenderer.send('otp:delete',file);
+        var name = document.getElementById('name').value + ' (tOTP)';
+        var secret = document.getElementById('secret').value;
+        ipcRenderer.send("otp:save", {
+            name:name,
+            secret:secret,
+        });
+        const remote = electron.remote;
+        let w = remote.getCurrentWindow();
+        w.close();
+      }
+
+      function closeWin() {
+        const remote = electron.remote;
+        let w = remote.getCurrentWindow();
+        w.close();
+      }
+
+
+      /**
+      Adds a delete button when you load the otp data
+      */
+      ipcRenderer.on('otp:load', (e, data, filename) => {
+        document.getElementById('name').value = data.name;
+        document.getElementById('name').disabled = true;
+        document.getElementById('secret').value = 'this is a secret right?';
+        document.getElementById('secret').disabled = true;
+
+        M.updateTextFields();
+
+        const formContainer = document.getElementById('form');
+        const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
+        formContainer.insertAdjacentHTML("beforeend", delBnt);
+        file = filename;
+
+        let totp = new otp.TOTP({
+          issuer: '',
+          label: '',
+          algorithm: 'SHA1',
+          digits: 6,
+          period: 30,
+          secret: data.secret
+      });
+
+        document.getElementById("otp_load").style.width = "0%";
+        document.getElementById('otp').value = totp.generate();
+
+        setInterval(()=>{
+          document.getElementById("otp_load").style.width = "0%";
+          document.getElementById('otp').value = totp.generate();
+        },30000);
+
+        setInterval(()=>{
+          var progress = parseInt(document.getElementById("otp_load").style.width.replace("%","")) + 1;
+          document.getElementById("otp_load").style.width = `${progress}%`;
+        },300);
+      });
+
+      function togglePassword(){
+        var x = document.getElementById("secret");
+        if (x.type === "password") {
+          x.type = "text";
+        } else {
+          x.type = "password";
+        }
+      }
+
+      function deleteAccount(){
+        ipcRenderer.send('otp:delete',file);
+        closeWin();
+      }
+      
+    </script>
+
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+  </body>
+</html>

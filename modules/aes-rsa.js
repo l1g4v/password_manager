@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const fs = require("fs");
-const dataLocation = process.env.PORTABLE_EXECUTABLE_DIR + "/data/";
+const dataLocation = (process.env.PORTABLE_EXECUTABLE_DIR || __dirname) + "/data/";
 
 const KEY_LENGTH = 32;
 const KEY_ITERATIONS = 15000;

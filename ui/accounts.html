@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta http-equiv="Content-Security-Policy" content="script-src 'self';" />
 <!--I am to lazy to properly document this-->
 <html>
   <head>
@@ -31,9 +32,14 @@
 
     <ul class="sidenav #212121 grey darken-4" id="sidebar">
       <li onclick="ipcRenderer.send('account:new')">
-        <a style="user-select: none;" class="grey-text">Add Account</a>
+        <a style="user-select: none;" class="grey-text">New entry</a>
       </li>
-      <li onclick="quit()"><a style="user-select: none;" class="grey-text">Quit</a></li>
+      <li onclick="ipcRenderer.send('otp:new')">
+        <a style="user-select: none;" class="grey-text">New totp entry</a>
+      </li>
+      <li onclick="quit()">
+        <a style="user-select: none;" class="grey-text">Quit</a>
+      </li>
     </ul>
 
     <ul id="list" class="collapsible expandable"></ul>
@@ -42,23 +48,42 @@
       var el = 0;
       const electron = require("electron");
       const { ipcRenderer } = electron;
-      const accountList = document.getElementById('list');
+      const accountList = document.getElementById("list");
 
       ipcRenderer.on("accounts:load", (e, data) => {
-        accountList.innerHTML = '';
+
+        accountList.innerHTML = "";
+        
         for (var i = 0; i < data.length; i++) {
-          var card = `<li >
-                    <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('account:load','${data[i].filename}')">
-                        <i class="material-icons">account_box</i>
-                        ${data[i].decrypted}
-                    </div>
-                    
-                </li>`;
-                accountList.insertAdjacentHTML("beforeend", card);
-          el++;
-          var instance = M.Collapsible.init(accountList, {
-            accordion: false,
-          });
+          if (data[i].decrypted.indexOf("(tOTP)") !== -1) {
+            var card = `<li >
+                  <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('otp:load','${data[i].filename}')">
+                      <i class="material-icons">lock</i>
+                      ${data[i].decrypted}
+                  </div>
+
+              </li>`;
+            accountList.insertAdjacentHTML("beforeend", card);
+            el++;
+            var instance = M.Collapsible.init(accountList, {
+              accordion: false,
+            });
+          } 
+          else {
+            var card = `<li >
+                  <div class="collapsible-header grey-text grey darken-4" ondblclick="ipcRenderer.send('account:load','${data[i].filename}')">
+                      <i class="material-icons">account_box</i>
+                      ${data[i].decrypted}
+                  </div>
+
+              </li>`;
+            accountList.insertAdjacentHTML("beforeend", card);
+            el++;
+            var instance = M.Collapsible.init(accountList, {
+              accordion: false,
+            });
+          }
+
         }
       });
 
@@ -70,7 +95,6 @@
       function quit() {
         ipcRenderer.send("app:quit");
       }
-
     </script>
     <script type="text/javascript" src="js/materialize.min.js"></script>
   </body>

@@ -10,3 +10,9 @@ why javascript? yeah js for security applications is not the best thing
 but I wanted something cross-platform¿
 
 proper docs?: I'm too lazy
+
+
+dependencies
+
+dev: electron & electron builder
+non dev: otpauth
