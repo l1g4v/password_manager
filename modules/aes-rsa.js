@@ -4,17 +4,17 @@ const dataLocation = (process.env.PORTABLE_EXECUTABLE_DIR || __dirname) + "/data
 
 const KEY_LENGTH = 32;
 const KEY_ITERATIONS = 15000;
-const KEY_DIGEST = "sha512";
 const AES_IV_SIZE = 16;
+const KEY_DIGEST = "sha512";
 const KEY_TEST_MSG = "if you can read this, congrats!";
 
 /**
  * Create a new account object
- * @param name String the account name
- * @param username String the account username (if available)
- * @param email String the account email (if available)
- * @param password String the account password
- * @returns Object
+ * @param {String} name  the account name
+ * @param {String} username  the account username (if available)
+ * @param {String} email  the account email (if available)
+ * @param {String} password  the account password
+ * @returns {Object}
  */
 exports.accountObject = (name, username = "", email = "", password = "") => {
   return {
@@ -47,7 +47,7 @@ exports.testPassword = (password) => {
 
 /**
  * Generate a RSA key pair and save them in files
- * @param passphrase String the private key password
+ * @param {String} passphrase the private key password
  */
 exports.generateKeyPair = (passphrase) => {
   if (!fs.existsSync(dataLocation)) fs.mkdirSync(dataLocation);
@@ -79,14 +79,14 @@ exports.generateKeyPair = (passphrase) => {
 
 /**
  * Read the RSA public key file
- * @returns String
+ * @returns {String}
  */
 exports.readPublicKey = () => {
   return fs.readFileSync(`${dataLocation}public`, "utf8");
 };
 /**
  * Read the RSA private key file
- * @returns String
+ * @returns {String}
  */
 exports.readPrivateKey = () => {
   return fs.readFileSync(`${dataLocation}private`, "utf8");
@@ -94,8 +94,8 @@ exports.readPrivateKey = () => {
 
 /**
  * Very simple decryption from a filename
- * @param filename String the filename
- * @returns String the decrypted name
+ * @param {String} filename  the filename
+ * @returns {String} the decrypted name
  */
 exports.getAccountName = (filename, passphrase) => {
   var privateKey = this.readPrivateKey();
@@ -115,12 +115,11 @@ exports.getAccountName = (filename, passphrase) => {
 /**
  * Reads all data directory and returns the accounts
  * filenames
- * @returns String[] the account filenames
+ * @returns {Array<String>} the account filenames
  */
 exports.getAllAccountFiles = (password) => {
   var filename = fs.readdirSync(dataLocation);
   var fileNames = [];
-  //if(filename.length == 3) return [];
   for (var i = 0; i < filename.length; i++)
     if (
       filename[i].indexOf(".key") === -1 &&
@@ -140,7 +139,7 @@ exports.getAllAccountFiles = (password) => {
 
 /**
  * Deletes an account crypto and key data
- * @param filename String
+ * @param {String} filename 
  */
 exports.deleteAccountFile = (filename) => {
   fs.unlinkSync(`${dataLocation}${filename}.key`);
@@ -149,7 +148,7 @@ exports.deleteAccountFile = (filename) => {
 
 /**
  * Encrypts an account and saves it to a file
- * @param data {Object}
+ * @param {Object} data 
  */
 exports.encryptData = (data) => {
   //load the public key
@@ -191,9 +190,9 @@ exports.encryptData = (data) => {
 
 /**
  * Decrypts an account file
- * @param filename String the filename
- * @param passphrase String the private key decrypt password
- * @returns {accountObject}
+ * @param {String} filename the filename
+ * @param {String} passphrase the private key decrypt password
+ * @returns {Object}
  */
 exports.decryptData = (filename, passphrase) => {
   //load private key and account files
@@ -216,7 +215,12 @@ exports.decryptData = (filename, passphrase) => {
   return JSON.parse(decrypted.toString("utf-8"));
 };
 
-//Just a simple aes encrypt function that returns the IV and encrypted data
+/**
+ * Encrypts an object
+ * @param {String} key encryption key
+ * @param {Object} data object to encrypt
+ * @returns {Object} iv and encrypted buffer
+ */
 function aesEncrypt(key, data) {
   var IV = crypto.randomBytes(AES_IV_SIZE);
   var validKey = Buffer.from(key);
@@ -227,15 +231,19 @@ function aesEncrypt(key, data) {
   };
 }
 
-//decrypt the data
+/**
+ * Encrypts an object
+ * @param {String} key encryption key
+ * @param {Object} data object to decrypt
+ * @returns {Buffer} decrypted buffer
+ */
 function aesDecrypt(key, data, IV) {
   var validKey = Buffer.from(key);
   var cipher = crypto.createDecipheriv("aes-256-cbc", validKey, IV);
   return Buffer.concat([cipher.update(data), cipher.final()]);
 }
 
-//#region dafuq
-//I don't know if i'm gonna replace these ones lol
+//Nothing complicated here
 function unsafeAESe(text, key) {
   var cipher = crypto.createCipher("aes-256-cbc", key);
   var crypted = cipher.update(text, "utf8", "hex");
@@ -249,40 +257,3 @@ function unsafeAESd(text, key) {
   dec += decipher.final("utf8");
   return dec;
 }
-
-//#endregion
-//console.log(this.getAllAccountFiles());
-/*
-this.encryptData({
-  name: "Netflix 1",
-  user: "nope",
-  email: 'yo@yo.es',
-  password: "yup this is da password yo",
-});*/
-
-//console.log(this.decryptData("e9bca4bb3d5dca1dd585a3c02c99af2e", passwordHash));
-//console.log(privateKey);
-//exports.generateKeyPair('si');
-/*
-var privateKey = exports.readPrivateKey();
-var publicKey = exports.readPublicKey();
-
-var encp = crypto.publicEncrypt(publicKey, Buffer.from("hola"));
-var decp = crypto.privateDecrypt({ key: privateKey, passphrase: "si" }, encp);
-
-console.log(encp.toString("hex"));
-console.log(decp.toString("utf8"));*/
-
-/*
-const sign = crypto.createSign('SHA256');
-sign.update('some data to sign');
-sign.end();
-const signature = sign.sign({key:privateKey , passphrase:'top secret'});
-
-const verify = crypto.createVerify('SHA256');
-verify.update('some data to sign');
-verify.end();
-console.log(verify.verify(publicKey, signature));
-
-console.log(signature);
-// Prints: true*/

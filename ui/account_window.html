@@ -132,8 +132,9 @@
         document.getElementById("user").value = data.user;
         document.getElementById("email").value = data.email;
         document.getElementById("password").value = data.password;
-        //document.getElementById("preview").src = b64; WIP
+
         M.updateTextFields();
+        
         const formContainer = document.getElementById("form");
         const delBnt = `<button class="btn waves-effect waves-light #6d4c41 brown darken-1" onclick="deleteAccount()">Delete</button>`;
         formContainer.insertAdjacentHTML("beforeend", delBnt);

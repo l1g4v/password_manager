@@ -1,18 +1,27 @@
-A very simple password manager
-I don't know if this is safe at all but it was fun to make
-I did it as a "practice" for what I learnt about AES and RSA
-it doesn't have the best UI but it does the work lol
+# Password manager ![](https://img.shields.io/github/package-json/v/l1g4v/password_manager) ![](https://img.shields.io/npm/v/npm)
 
-the most unsafe thing in my opinion is how the password is stored in
-"raw text" but I dont have idea of how to make that more secure
+This is a very simple and not complex password manager made to find a use for those old usb drives
 
-why javascript? yeah js for security applications is not the best thing
-but I wanted something cross-platform¿
+## Installation
 
-proper docs?: I'm too lazy
+You can get a portable binary from the releases tab, or build it yourself
 
+```bash
+npm i --dev
+npm i
+electron-builder -<platform code> # "w" for Windows, "l" for Linux, and "m" for macOS or all of 'em
+```
 
-dependencies
+## Usage
+```bash
+npm start
+```
+Or just run the binary
 
-dev: electron & electron builder
-non dev: otpauth
+## Dependencies ![](https://img.shields.io/david/l1g4v/password_manager?label=%20)
+![](https://img.shields.io/npm/v/electron?label=electron@dev)\
+![](https://img.shields.io/npm/v/electron-builder?label=electron-builder@dev)\
+![](https://img.shields.io/npm/v/otpauth?label=otpauth)
+
+## License
+I forgot to put one, but do whatever you want

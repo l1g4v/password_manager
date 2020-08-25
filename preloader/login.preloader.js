@@ -1,7 +1,6 @@
 const {
     contextBridge,
     ipcRenderer,
-    remote
 } = require("electron");
 const crypto = require('crypto');
 

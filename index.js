@@ -1,8 +1,8 @@
 const electron = require("electron");
-const { app, BrowserWindow, Menu, ipcMain } = electron;
+const { app, BrowserWindow, ipcMain } = electron;
 const url = require("url");
 const cryptoTask = require("./modules/aes-rsa");
-var loginHash = "";
+let loginHash = "";
 let mainWindow;
 
 app.on("ready", () => {
@@ -43,7 +43,7 @@ let loadAccountMenu = () => {
     width: 450,
     webPreferences: {
       nodeIntegration: false,
-      devTools: true,
+      devTools: false,
       preload: app.getAppPath() + '/preloader/accounts.preloader.js',
       contextIsolation: true,
       enableRemoteModule: false,
@@ -53,6 +53,7 @@ let loadAccountMenu = () => {
     resizable: false,
     show: false,
   });
+
   mainWindow.loadURL(
     url.format({
       pathname: app.getAppPath() + "/ui/accounts.html",
@@ -230,5 +231,4 @@ app.on("web-contents-created", (event, contents) => {
   contents.on("will-attach-webview", (event, webPreferences, params) => {
     event.preventDefault();
   });
-
 });
